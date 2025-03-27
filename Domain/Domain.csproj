@@ -9,6 +9,8 @@
   <ItemGroup>
     <Folder Include="Entities\" />
     <Folder Include="Enum\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Enum\" />
   </ItemGroup>
 
 </Project>
