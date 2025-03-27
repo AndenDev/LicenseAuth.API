@@ -14,7 +14,7 @@ namespace Infrastructure.Repositories
         protected readonly ApplicationDbContext _context;
 
         // Toggle this to enable caching
-        private readonly bool _includeCaching = false;
+        private readonly bool _includeCaching = true;
 
         private static readonly string _baseCacheKey = typeof(GenericRepositoryBase<>).FullName ?? "GenericRepositoryBase";
         protected static ConcurrentBag<string> _cacheKeys = new();
