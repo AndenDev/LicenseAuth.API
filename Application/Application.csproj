@@ -11,11 +11,6 @@
     <Folder Include="Features\License\Handlers\" />
     <Folder Include="Features\License\DTOs\" />
     <Folder Include="Features\License\Mappings\" />
-    <Folder Include="Features\License\DTOs\" />
-    <Folder Include="Features\License\Handlers\" />
-    <Folder Include="Features\License\Mappings\" />
-    <Folder Include="Features\License\Validators\" />
-    <Folder Include="Features\License\Queries\" />
     <Folder Include="Features\License\Validators\" />
     <Folder Include="Features\License\Queries\" />
     <Folder Include="Interfaces\Services\" />
