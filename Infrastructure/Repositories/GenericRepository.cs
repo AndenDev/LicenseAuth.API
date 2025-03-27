@@ -5,7 +5,7 @@ using Persistence.Context;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 
-namespace Persistence.Repositories
+namespace Infrastructure.Repositories
 {
     public partial class GenericRepository<TEntity>(
         ApplicationDbContext context,
@@ -150,6 +150,46 @@ namespace Persistence.Repositories
         #endregion
 
         #region Get
+
+        public async Task<TResult?> GetAsync<TResult>(
+    Expression<Func<TEntity, bool>>? predicate,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include,
+    Expression<Func<TEntity, TResult>> selectExpression,
+    CancellationToken cancellationToken = default)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+
+            if (predicate is not null)
+                query = query.Where(predicate);
+
+            if (include is not null)
+                query = include(query);
+
+            return await GetOrCacheResultAsync(query, () => query.Select(selectExpression).FirstOrDefaultAsync(cancellationToken));
+        }
+        public async Task<TEntity?> GetAsync<TOrderBy>(
+    Expression<Func<TEntity, bool>>? predicate,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include,
+    Expression<Func<TEntity, TOrderBy>> orderBy,
+    bool isDescending = false,
+    CancellationToken cancellationToken = default)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+
+            if (predicate is not null)
+                query = query.Where(predicate);
+
+            if (include is not null)
+                query = include(query);
+
+            query = isDescending
+                ? query.OrderByDescending(orderBy)
+                : query.OrderBy(orderBy);
+
+            return await GetOrCacheResultAsync(query, () => query.FirstOrDefaultAsync(cancellationToken));
+        }
+
+
         public async Task<TEntity?> GetAsync(
             Expression<Func<TEntity, bool>>? predicate,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,

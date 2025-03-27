@@ -1,22 +1,21 @@
 ﻿using Application.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
+using Microsoft.Extensions.Caching.Memory;
+using Persistence.Context;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Persistence.Repositories
+namespace Infrastructure.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DbContext _context;
+        private readonly IMemoryCache _memoryCache;
         private readonly ConcurrentDictionary<Type, object> _repositories = new();
 
-        public UnitOfWork(DbContext context)
+        public UnitOfWork(DbContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
 
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class
@@ -25,7 +24,11 @@ namespace Persistence.Repositories
 
             if (!_repositories.ContainsKey(type))
             {
-                var repoInstance = new GenericRepository<TEntity>(_context);
+                var repoInstance = new GenericRepository<TEntity>(
+                    (ApplicationDbContext)_context, 
+                    _memoryCache
+                );
+
                 _repositories[type] = repoInstance;
             }
 

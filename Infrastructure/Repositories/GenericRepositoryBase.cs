@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Persistence.Repositories
+namespace Infrastructure.Repositories
 {
     public abstract class GenericRepositoryBase<TEntity> where TEntity : class
     {
