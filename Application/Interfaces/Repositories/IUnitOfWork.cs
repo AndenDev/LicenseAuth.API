@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.Repositories
 {
-    internal interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class;
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
