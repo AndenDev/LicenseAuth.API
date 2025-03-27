@@ -8,17 +8,39 @@ using System.Text;
 
 namespace Infrastructure.Repositories
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
     public abstract class GenericRepositoryBase<TEntity> where TEntity : class
     {
+        /// <summary>
+        /// The memory cache
+        /// </summary>
         protected readonly IMemoryCache _memoryCache;
+        /// <summary>
+        /// The context
+        /// </summary>
         protected readonly ApplicationDbContext _context;
 
         // Toggle this to enable caching
+        /// <summary>
+        /// The include caching
+        /// </summary>
         private readonly bool _includeCaching = true;
 
+        /// <summary>
+        /// The base cache key
+        /// </summary>
         private static readonly string _baseCacheKey = typeof(GenericRepositoryBase<>).FullName ?? "GenericRepositoryBase";
+        /// <summary>
+        /// The cache keys
+        /// </summary>
         protected static ConcurrentBag<string> _cacheKeys = new();
 
+        /// <summary>
+        /// The cache entry options
+        /// </summary>
         private static readonly MemoryCacheEntryOptions _cacheEntryOptions = new()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
@@ -26,12 +48,24 @@ namespace Infrastructure.Repositories
             Priority = CacheItemPriority.Normal
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericRepositoryBase{TEntity}"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="cache">The cache.</param>
         protected GenericRepositoryBase(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
             _memoryCache = cache;
         }
 
+        /// <summary>
+        /// Gets the or cache result asynchronous.
+        /// </summary>
+        /// <typeparam name="TReturn">The type of the return.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="executeQuery">The execute query.</param>
+        /// <returns></returns>
         protected async Task<TReturn?> GetOrCacheResultAsync<TReturn>(
             IQueryable<TEntity> query,
             Func<Task<TReturn?>> executeQuery)
@@ -48,6 +82,13 @@ namespace Infrastructure.Repositories
             });
         }
 
+        /// <summary>
+        /// Gets the or cache result.
+        /// </summary>
+        /// <typeparam name="TReturn">The type of the return.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="executeQuery">The execute query.</param>
+        /// <returns></returns>
         protected TReturn? GetOrCacheResult<TReturn>(
             IQueryable<TEntity> query,
             Func<TReturn?> executeQuery)
@@ -65,6 +106,12 @@ namespace Infrastructure.Repositories
         }
 
 
+        /// <summary>
+        /// Generates the cache key.
+        /// </summary>
+        /// <typeparam name="TReturn">The type of the return.</typeparam>
+        /// <param name="queryString">The query string.</param>
+        /// <returns></returns>
         private string GenerateCacheKey<TReturn>(string queryString)
         {
             using var sha256 = SHA256.Create();
@@ -79,6 +126,12 @@ namespace Infrastructure.Repositories
             return cacheKey;
         }
 
+        /// <summary>
+        /// Builds the selector.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns></returns>
         protected static Expression<Func<T, object>> BuildSelector<T>(string propertyName)
         {
             var param = Expression.Parameter(typeof(T), "x");
